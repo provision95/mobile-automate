@@ -19,6 +19,9 @@ unittest-xml-reporting = "^3.2.0"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+readme = "README.md"
+
+repository = "https://github.com/provision95/mobile-automate.git"
 
 [tool.poetry.scripts]
-dirscrpit = "additional_script:__main__"
+dirscript = "additional_script:main"
