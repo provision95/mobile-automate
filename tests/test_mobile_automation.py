@@ -260,7 +260,7 @@ class RegisterContact(TestCase):
         tag.send_keys(self.__class__._tag)
         # noinspection JSUnresolvedVariable,UnnecessaryLabelJS
         self.driver.execute_script("mobile: performEditorAction", {'action': 'done'})
-        self.driver.implicitly_wait(1)
+        self.driver.implicitly_wait(1.5)
         if self.driver.is_keyboard_shown():
             self.driver.hide_keyboard()
 
