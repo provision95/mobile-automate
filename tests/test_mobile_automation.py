@@ -4,11 +4,12 @@ import pytest
 import allure_commons.types
 from unittest import TestCase
 from appium import webdriver
+from appium.options.android import UiAutomator2Options
 from appium.webdriver.common.appiumby import AppiumBy as By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.expected_conditions import presence_of_element_located as loc
 
-'''
+"""
 @Author: Petrov Roman
 @Date: 2022-08-06
 @Description: This script is a test script for appium automation framework. The script covers most of the 
@@ -22,9 +23,10 @@ Tests are ordered and should run in specified order.(pytest-order plugin). All p
 file.
 
 Tests store test result data into Allure folder. This is done by parametrizing the run configuration.  
-'''
+"""
 class RegisterContact(TestCase):
     dc = {}
+    options = UiAutomator2Options()
     testName = 'RegisterContact'
     driver = None
 
@@ -53,7 +55,7 @@ class RegisterContact(TestCase):
         cls.dc['platformName'] = 'android'
         cls.dc['dontStopAppOnReset'] = 'true'
         cls.dc['autoGrantPermissions'] = 'true'
-        cls.driver = webdriver.Remote('http://localhost:4723/wd/hub', cls.dc)
+        cls.driver = webdriver.Remote('http://localhost:4723/wd/hub', options=cls.options.load_capabilities(caps=cls.dc))
 
     @pytest.mark.order(1)
     def test_Contacts(self):
@@ -304,58 +306,6 @@ class RegisterContact(TestCase):
         self.driver.back()
 
     @pytest.mark.order(5)
-    @pytest.mark.xfail(raises=AssertionError)
-    @allure.description('''
-        THIS TEST RUNS TWO TIMES, IT IS EXPECTED TO FAIL ON THE SECOND ATTEMPT. ASSERTION ERROR RAISES BECAUSE OF THE
-        APP BUG >> THE CONTACT INFO DISAPPEARS AFTER SOME TIME.
-        ''')
-    def test_ContactDetail(self):
-        # find the last added contact
-        WebDriverWait(self.driver, 10).until(loc((By.ID, 'lv_contact_name_list')))
-        plist = self.driver.find_element(By.ID, 'lv_contact_name_list').find_elements(
-            By.XPATH, '//*[contains(@resource-id,"layout_contact_list_item")]')
-        plist[-1].click()
-        WebDriverWait(self.driver, 10).until(loc((By.ID, 'tv_contact_detail_name')))
-
-        assert self.driver.find_element(
-            By.ID, 'tv_contact_detail_name').text == self.__class__._fname + self.__class__._lname
-        assert self.driver.find_element(
-            By.ID, 'tv_contact_detail_full_path').text == self.__class__._cname + '>' + self.__class__._org
-        assert self.driver.find_element(By.ID, 'tv_contact_detail_phone').text == self.__class__._phone
-        assert self.driver.find_element(By.ID, 'tv_contact_detail_email').text == self.__class__._email
-        assert self.driver.find_element(By.ID, 'tv_contact_detail_group').text == self.__class__._group
-
-        allure.attach(self.driver.get_screenshot_as_png(), name='screenshot4.1',
-                      attachment_type=allure_commons.types.AttachmentType.PNG)
-
-        self.driver.find_element(By.ACCESSIBILITY_ID, 'Work information').click()
-
-        assert self.driver.find_element(By.ID, 'tv_contact_detail_company_name').text == self.__class__._cname
-        assert self.driver.find_element(By.ID, 'tv_contact_detail_organization').text == self.__class__._org
-        assert self.driver.find_element(By.ID, 'tv_contact_detail_rank').text == self.__class__._rank
-        assert self.driver.find_element(By.ID, 'tv_contact_detail_task').text == self.__class__._task
-        assert self.driver.find_element(
-            By.ID, 'tv_contact_detail_address1').text.replace('  ', ' ') == self.__class__._workaddr
-
-        allure.attach(self.driver.get_screenshot_as_png(), name='screenshot4.2',
-                      attachment_type=allure_commons.types.AttachmentType.PNG)
-
-        self.driver.find_element(By.ACCESSIBILITY_ID, 'Other information').click()
-
-        assert self.driver.find_element(
-            By.ID, 'tv_contact_detail_zip').text.replace('  ', ' ') == self.__class__._homeaddr
-        assert self.driver.find_element(By.ID, 'tv_contact_detail_homepage').text == f'https://{self.__class__._hp}'
-        assert self.driver.find_element(
-            By.ID, 'tv_contact_detail_birthday').text == datetime.date.today().strftime('(Solar)%Yyear %mmonth %dday')
-        assert self.driver.find_element(By.ID, 'tv_contact_detail_memo').text == self.__class__._memo
-        assert self.driver.find_element(By.ID, 'tv_contact_detail_tag').text == self.__class__._tag
-
-        allure.attach(self.driver.get_screenshot_as_png(), name='screenshot4.3',
-                      attachment_type=allure_commons.types.AttachmentType.PNG)
-
-        self.driver.find_element(By.ACCESSIBILITY_ID, 'Navigate up').click()
-
-    @pytest.mark.order(6)
     @allure.description('''
     AFTER CANCELING SEARCH COMMAND THE CONTACT LIST SHOWS ARTIFACTS OF EXISTING CONTACTS.(SCREENSHOT)
     ''')
@@ -406,7 +356,7 @@ class RegisterContact(TestCase):
         allure.attach(self.driver.get_screenshot_as_png(), name='screenshot6.3',
                       attachment_type=allure_commons.types.AttachmentType.PNG)
 
-    @pytest.mark.order(7)
+    @pytest.mark.order(6)
     def test_Sort(self):
         WebDriverWait(self.driver, 30).until(loc((By.ID, 'lv_contact_name_list')))
         self.driver.find_element(By.ID, 'iv_dz_DropDownSelectBar_contact_icon_filter').click()
@@ -415,7 +365,7 @@ class RegisterContact(TestCase):
         self.driver.find_element(By.ID, 'iv_dz_DropDownSelectBar_contact_icon_filter').click()
         self.driver.find_element(By.XPATH, '//*[contains(@text,"Ascending")]').click()
 
-    @pytest.mark.order(8)
+    @pytest.mark.order(7)
     def test_ModifyContact(self):
         plist = self.driver.find_element(By.ID, 'lv_contact_name_list').find_elements(
             By.CLASS_NAME, 'android.widget.LinearLayout')
@@ -432,6 +382,60 @@ class RegisterContact(TestCase):
         WebDriverWait(self.driver, 30).until(loc((By.ACCESSIBILITY_ID, 'Navigate up')))
         self.driver.find_element(By.ACCESSIBILITY_ID, 'Navigate up').click()
 
+    @pytest.mark.order(8)
+    @allure.description("""THIS TEST IS EXPECTED TO FAIL.
+        ASSERTION ERROR RAISES BECAUSE OF THE APP BUG >> THE CONTACT INFO DISAPPEARS AFTER SOME TIME.""")
+    def test_ContactDetail(self):
+        # find the last added contact
+        WebDriverWait(self.driver, 10).until(loc((By.ID, 'lv_contact_name_list')))
+        plist = self.driver.find_element(By.ID, 'lv_contact_name_list').find_elements(
+            By.XPATH, '//*[contains(@resource-id,"layout_contact_list_item")]')
+        plist[1].click()
+        WebDriverWait(self.driver, 10).until(loc((By.ID, 'tv_contact_detail_name')))
+
+        try:
+            assert self.driver.find_element(
+                By.ID, 'tv_contact_detail_name').text == self.__class__._fname + self.__class__._lname
+            assert self.driver.find_element(
+                By.ID, 'tv_contact_detail_full_path').text == self.__class__._cname + '>' + self.__class__._org
+            assert self.driver.find_element(By.ID, 'tv_contact_detail_phone').text == self.__class__._phone
+            assert self.driver.find_element(By.ID, 'tv_contact_detail_email').text == self.__class__._email
+            assert self.driver.find_element(By.ID, 'tv_contact_detail_group').text == self.__class__._group
+
+            allure.attach(self.driver.get_screenshot_as_png(), name='screenshot4.1',
+                          attachment_type=allure_commons.types.AttachmentType.PNG)
+
+            self.driver.find_element(By.ACCESSIBILITY_ID, 'Work information').click()
+
+            assert self.driver.find_element(By.ID, 'tv_contact_detail_company_name').text == self.__class__._cname
+            assert self.driver.find_element(By.ID, 'tv_contact_detail_organization').text == self.__class__._org
+            assert self.driver.find_element(By.ID, 'tv_contact_detail_rank').text == self.__class__._rank
+            assert self.driver.find_element(By.ID, 'tv_contact_detail_task').text == self.__class__._task
+            assert self.driver.find_element(
+                By.ID, 'tv_contact_detail_address1').text.replace('  ', ' ') == self.__class__._workaddr
+
+            allure.attach(self.driver.get_screenshot_as_png(), name='screenshot4.2',
+                          attachment_type=allure_commons.types.AttachmentType.PNG)
+
+            self.driver.find_element(By.ACCESSIBILITY_ID, 'Other information').click()
+
+            assert self.driver.find_element(
+                By.ID, 'tv_contact_detail_zip').text.replace('  ', ' ') == self.__class__._homeaddr
+            assert self.driver.find_element(By.ID, 'tv_contact_detail_homepage').text == f'https://{self.__class__._hp}'
+            assert self.driver.find_element(
+                By.ID, 'tv_contact_detail_birthday').text == datetime.date.today().strftime(
+                '(Solar)%Yyear %mmonth %dday')
+            assert self.driver.find_element(By.ID, 'tv_contact_detail_memo').text == self.__class__._memo
+            assert self.driver.find_element(By.ID, 'tv_contact_detail_tag').text == self.__class__._tag
+
+            allure.attach(self.driver.get_screenshot_as_png(), name='screenshot4.3',
+                          attachment_type=allure_commons.types.AttachmentType.PNG)
+        except AssertionError:
+            allure.attach(self.driver.get_screenshot_as_png(), name='screenshot4.3',
+                          attachment_type=allure_commons.types.AttachmentType.PNG)
+            raise
+        finally:
+            self.driver.find_element(By.ACCESSIBILITY_ID, 'Navigate up').click()
     @pytest.mark.order(9)
     def test_DeleteContacts(self):
         WebDriverWait(self.driver, 10).until(loc((By.ID, 'iv_dz_DropDownSelectBar_contact_icon_mod')))
