@@ -19,7 +19,12 @@ To run the project a user has to install [Poetry](https://python-poetry.org/).
 <ol>
     <li><code>poetry shell</code> - activate virtual environment.</li>
     <li><code>poetry install</code> - install dependencies.</li>
+    <li><code>poetry run alluredir</code> - crerate allure report directory</li>
     <li><code>poetry build</code> - build the project.</li>
-    <li><code>poetry run pytest --alluredir="./Allure" /tests/ContactTests.py</code> - run the tests.</li>
+    <li><code>poetry run pytest --alluredir="./Allure" /tests/test-mobile-automation.py</code> - run the tests.</li>
     <li><code>deactivate</code> - to deactivate virtual environment.</li>
 </ol>
+
+## Allure report server
+
+Run <code>allure serve {path to project}/Allure</code> to activate allure report server.
