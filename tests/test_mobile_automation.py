@@ -1,14 +1,3 @@
-import datetime
-import allure
-import pytest
-import allure_commons.types
-from unittest import TestCase
-from appium import webdriver
-from appium.options.android import UiAutomator2Options
-from appium.webdriver.common.appiumby import AppiumBy as By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support.expected_conditions import presence_of_element_located as loc
-
 """
 @Author: Petrov Roman
 @Date: 2022-08-06
@@ -22,8 +11,20 @@ specifics of a blackbox testing.
 Tests are ordered and should run in specified order.(pytest-order plugin). All plugins are included into pyproject.toml
 file.
 
-Tests store test result data into Allure folder. This is done by parametrizing the run configuration.  
+Tests store test result data into allure-report folder. This is done by parametrizing the run configuration.
 """
+
+import datetime
+import allure
+import pytest
+import allure_commons.types
+from unittest import TestCase
+from appium import webdriver
+from appium.options.android import UiAutomator2Options
+from appium.webdriver.common.appiumby import AppiumBy as By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.expected_conditions import presence_of_element_located as loc
+
 class RegisterContact(TestCase):
     dc = {}
     options = UiAutomator2Options()
@@ -60,6 +61,7 @@ class RegisterContact(TestCase):
     @pytest.mark.order(1)
     def test_Contacts(self):
         # enter contacts menu
+
         WebDriverWait(self.driver, 30).until(loc((By.ID, 'cl_main_screen')))
         self.driver.find_element(By.ID, 'servicelist_recyclerview').find_elements(
             By.CLASS_NAME, 'android.widget.LinearLayout')[6].click()
@@ -436,6 +438,7 @@ class RegisterContact(TestCase):
             raise
         finally:
             self.driver.find_element(By.ACCESSIBILITY_ID, 'Navigate up').click()
+    
     @pytest.mark.order(9)
     def test_DeleteContacts(self):
         WebDriverWait(self.driver, 10).until(loc((By.ID, 'iv_dz_DropDownSelectBar_contact_icon_mod')))
